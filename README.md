@@ -15,7 +15,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” 
 ## `main` branch
 
 Specific tweaks:
-- Change Variable names of VEX and Vexchange
+- Change variable names of LP token `symbol` and `name`.
 - `CREATE2` hash. 
 - `chainId()` OPCODE call remains the same
 - Compiler option `istanbul` remains the same.
@@ -24,10 +24,10 @@ This will **NOT** enable to be run on VeChain now because the EVM doesn't suppor
 
 But eventually it is the unified set of code that is deployed on VeChain after the EVM support `istanbul` is in place.
 
-## `testnet` and `mainnet` branch
+## `testnet` branch
 Based on `main` branch.
 
 Specific tweaks: 
-- `chainId()` tweak (fixed value) for different branches “testnet” and “mainnet”.
+- `chainId()` tweak (fixed value) for different network: “testnet”.
 - `istanbul` compiler option change to `constantinpole`.
 - `CREATE2` hash change of respective files.
