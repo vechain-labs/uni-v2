@@ -4,13 +4,20 @@ All tests passed.
 
 ## `main` branch
 
-Change Variable names, CREATE2 hash. But “chainId()” OPCODE call remains the same + Compiler option `istanbul` remain the same.
+Specific tweaks:
+- Change Variable names of VEX and Vexchange
+- `CREATE2` hash. 
+- `chainId()` OPCODE call remains the same
+- Compiler option `istanbul` remains the same.
 
-This will NOT enable to be run on VeChain now because the EVM doesn't support it, yet.
+This will **NOT** enable to be run on VeChain now because the EVM doesn't support it, yet.
 
-But eventually it is the unified set of code that is deployed on VeChain after the EVM support is in place.
+But eventually it is the unified set of code that is deployed on VeChain after the EVM support `istanbul` is in place.
 
 ## `testnet` and `mainnet` branch
-Based on `tweak` branch.
+Based on `main` branch.
 
-Specific tweak: “chainId” tweak (fixed value), for different branches “testnet” and “mainnet”, + Constantinpole change for Istanbul + CREATE2 hash change.
+Specific tweaks: 
+- `chainId()` tweak (fixed value) for different branches “testnet” and “mainnet”.
+- `istanbul` compiler option change to `constantinpole`.
+- `CREATE2` hash change of respective files.
