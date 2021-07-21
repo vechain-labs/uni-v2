@@ -30,9 +30,7 @@ What remains:
 - `chainId()` OPCODE call remains the same
 - Compiler option `istanbul` remains the same.
 
-This will **NOT** enable to be run on VeChain now because the EVM doesn't support it, yet.
-
-But eventually it is the unified set of code that is deployed on VeChain after the EVM support `istanbul` is in place.
+This is compatible with VeChain after update of thor code `1.5.1`
 
 # Below Should NOT Be Used
 
