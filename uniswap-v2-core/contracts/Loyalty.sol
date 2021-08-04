@@ -6,8 +6,10 @@ pragma solidity =0.5.16;
 // The longer the time period, the better; More points, the better.
 
 import './interfaces/ILoyalty.sol';
+import './libraries/SafeMath.sol';
 
 contract Loyalty is ILoyalty {
+    using SafeMath for uint256;
 
     struct User {
         uint256 points; // The total points a user earned.
