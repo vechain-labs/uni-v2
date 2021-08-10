@@ -12,6 +12,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     using SafeMath  for uint;
     using UQ112x112 for uint224;
 
+    address public constant VTHO_CONTRACT_ADDRESS = 0x0000000000000000000000000000456e65726779;
     uint public constant MINIMUM_LIQUIDITY = 10**3;
     bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
 
@@ -197,5 +198,24 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     // force reserves to match balances
     function sync() external lock {
         _update(IERC20(token0).balanceOf(address(this)), IERC20(token1).balanceOf(address(this)), reserve0, reserve1);
+    }
+
+    // View total generated VTHO this pool holds.
+    // Three types of pools:
+    // 1) VET/VTHO: vet generates vtho, vtho is also supplied by LPs.
+    // 2) OCE/VTHO: no generate of vtho, vtho is only supplied by LPs.
+    // 3) OCE/SHA: no generate of vtho, vtho is 0.
+    function viewTotalGeneratedVTHO() public view (uint256) {
+        return 0;
+    }
+
+    // User Generated VTHO = (Total Generated VTHO) x (User contribution)
+    function viewUserGeneratedVTHO(address who) public view (uint256) {
+        return 0;
+    }
+
+    // msg.sender claims the vtho that he holds, to the receiver
+    function claimGeneratedVTHO(address receiver, uint256 amount) external {
+        ;
     }
 }

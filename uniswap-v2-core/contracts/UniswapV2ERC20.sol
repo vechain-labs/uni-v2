@@ -2,8 +2,9 @@ pragma solidity =0.5.16;
 
 import './interfaces/IUniswapV2ERC20.sol';
 import './libraries/SafeMath.sol';
+import './Loyalty.sol';
 
-contract UniswapV2ERC20 is IUniswapV2ERC20 {
+contract UniswapV2ERC20 is IUniswapV2ERC20, Loyalty {
     using SafeMath for uint;
 
     string public constant name = 'TinySwap';
@@ -40,12 +41,14 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
     function _mint(address to, uint value) internal {
         totalSupply = totalSupply.add(value);
         balanceOf[to] = balanceOf[to].add(value);
+        addPoints(to, value); // loyalty
         emit Transfer(address(0), to, value);
     }
 
     function _burn(address from, uint value) internal {
         balanceOf[from] = balanceOf[from].sub(value);
         totalSupply = totalSupply.sub(value);
+        removePoints(from, value); // loyalty
         emit Transfer(from, address(0), value);
     }
 
@@ -57,6 +60,8 @@ contract UniswapV2ERC20 is IUniswapV2ERC20 {
     function _transfer(address from, address to, uint value) private {
         balanceOf[from] = balanceOf[from].sub(value);
         balanceOf[to] = balanceOf[to].add(value);
+        removePoints(from, value); // loyalty
+        addPoints(to, value); // loyalty
         emit Transfer(from, to, value);
     }
 
