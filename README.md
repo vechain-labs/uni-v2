@@ -27,32 +27,18 @@ What is changed:
 - `CREATE2` hash. (uniswap-v2-periphery/contracts/libraries/UniswapV2Library.sol)
 
 What remains:
-- `chainId()` OPCODE call remains the same
+- `chainId()` call remains the same.
 - Compiler option `istanbul` remains the same.
 
 This is compatible with VeChain after update of thor code `1.5.1`
 
-# Below Should NOT Be Used
+## Development Branches
+## Deprecated Branches
+`mainnet` branch. See `CHANGELOG.md`
 
-## `testnet` branch
-Based on `main` branch.
+`testnet` branch. See `CHANGELOG.md`
 
-Specific tweaks: 
-- `chainId()` tweak (fixed value) for different network: “testnet” `0x27`.
-- `istanbul` compiler option change to `constantinpole`.
-- `CREATE2` hash change of respective files.
-- Test cases changes to include `chainId` as a parameter.
-
-## `mainnet` branch
-Based on `testnet` branch
-
-Specific tweaks:
-- `chainId()` tweak (fixed value) for different network: “mainnet” `0x4a`.
-- Compiler change same as `testnet` branch.
-- `CREATE2` hash change of respective files.
-- Test cases changes same as on `testnet` branch.
-
-## Disclaimer
+# Disclaimer
 Redistributions of source code must retain this list of conditions and the following disclaimer.
 
 Neither the name of VeChain (VeChain Foundation) nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
