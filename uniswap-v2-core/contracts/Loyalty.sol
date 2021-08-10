@@ -62,6 +62,17 @@ contract Loyalty {
         return user.contribution + calculateContribution(user.lastUpdatedTime, block.timestamp, user.points);
     }
 
+    // Remove the user's contribution
+    function removeContribution (address _who, uint256 _amount) internal {
+        update(_who);
+        require(users[_who].contribution >= _amount, "Loyalty: contribution not enough");
+        users[_who].contribution -= _amount;
+        users[_who].lastUpdatedTime = block.timestamp;
+        
+        total.contribution -= _amount;
+        total.lastUpdatedTime = block.timestamp;
+    }
+
     // View contribution of the whole program
     function viewTotalContribution () public view returns (uint256) {
         return total.contribution + calculateContribution(total.lastUpdatedTime, block.timestamp, total.points);
