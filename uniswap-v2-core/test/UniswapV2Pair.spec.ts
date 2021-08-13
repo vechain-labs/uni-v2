@@ -12,14 +12,14 @@ const MINIMUM_LIQUIDITY = bigNumberify(10).pow(3)
 chai.use(solidity)
 
 const overrides = {
-  gasLimit: 9999999
+  gasLimit: 99999999
 }
 
 describe('UniswapV2Pair', () => {
   const provider = new MockProvider({
     hardfork: 'istanbul',
     mnemonic: 'horn horn horn horn horn horn horn horn horn horn horn horn',
-    gasLimit: 9999999
+    gasLimit: 99999999
   })
   const [wallet, other] = provider.getWallets()
   const loadFixture = createFixtureLoader(provider, [wallet])
