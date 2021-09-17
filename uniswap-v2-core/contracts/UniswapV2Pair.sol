@@ -61,6 +61,7 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         address indexed to
     );
     event Sync(uint112 reserve0, uint112 reserve1);
+    event ClaimGeneratedVTHO(address owner, address receiver, uint256 amount);
 
     constructor() public {
         factory = msg.sender;
@@ -253,5 +254,6 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         require (_userVtho > 0, "UniswapV2Pair: user generated vtho is 0");
         IVthoClaimable(WETH).claimVTHO(receiver, _userVtho);
         removeContribution(_who, _userContrib);
+        emit ClaimGeneratedVTHO(_who, receiver, _userVtho);
     }
 }
