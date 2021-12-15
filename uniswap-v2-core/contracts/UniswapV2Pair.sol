@@ -7,17 +7,21 @@ import './libraries/UQ112x112.sol';
 import './interfaces/IERC20.sol';
 import './interfaces/IUniswapV2Factory.sol';
 import './interfaces/IUniswapV2Callee.sol';
+import './interfaces/IStakingModel.sol';
+import './interfaces/IVthoClaimable.sol';
 
 contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     using SafeMath  for uint;
     using UQ112x112 for uint224;
 
+    address public constant VTHO_CONTRACT_ADDRESS = 0x0000000000000000000000000000456E65726779;
     uint public constant MINIMUM_LIQUIDITY = 10**3;
     bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
 
     address public factory;
     address public token0;
     address public token1;
+    address public WETH;
 
     uint112 private reserve0;           // uses single storage slot, accessible via getReserves
     uint112 private reserve1;           // uses single storage slot, accessible via getReserves
@@ -57,16 +61,18 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
         address indexed to
     );
     event Sync(uint112 reserve0, uint112 reserve1);
+    event ClaimGeneratedVTHO(address owner, address receiver, uint256 amount);
 
     constructor() public {
         factory = msg.sender;
     }
 
     // called once by the factory at time of deployment
-    function initialize(address _token0, address _token1) external {
+    function initialize(address _token0, address _token1, address _weth) external {
         require(msg.sender == factory, 'UniswapV2: FORBIDDEN'); // sufficient check
         token0 = _token0;
         token1 = _token1;
+        WETH = _weth;
     }
 
     // update reserves and, on the first call per block, price accumulators
@@ -197,5 +203,57 @@ contract UniswapV2Pair is IUniswapV2Pair, UniswapV2ERC20 {
     // force reserves to match balances
     function sync() external lock {
         _update(IERC20(token0).balanceOf(address(this)), IERC20(token1).balanceOf(address(this)), reserve0, reserve1);
+    }
+
+    // View total generated VTHO this pool holds.
+    // Four types of pools:
+    // 1) VET/VTHO: vet generates vtho, vtho is also supplied by LPs.
+    // 2) VET/OCE: vet generates vtho, no other vtho.
+    // 3) OCE/VTHO: not generate vtho, vtho is only supplied by LPs.
+    // 4) OCE/SHA: not generate vtho, no other vtho.
+    function viewTotalGeneratedVTHO() public view returns (uint256) {
+        uint256 _totalVtho;
+        address _token0 = token0; // save gas
+        if (_token0 == WETH) {
+            _totalVtho = IStakingModel(_token0).vthoBalance(address(this));
+            return _totalVtho;
+        }
+        address _token1 = token1; // save gas
+        if (_token1 == WETH) {
+            _totalVtho = IStakingModel(_token1).vthoBalance(address(this));
+            return _totalVtho;
+        }
+        return 0;
+    }
+
+    // User Generated VTHO = (Total Generated VTHO) x (User contribution) / (Total Contribution)
+    function viewUserGeneratedVTHO(address who) public view returns (uint256) {
+        uint256 _totalContrib = viewTotalContribution();
+        uint256 _userContrib = viewContribution(who);
+        if (_totalContrib == 0 || _userContrib == 0) {
+            return 0;
+        }
+        
+        uint256 _totalVtho = viewTotalGeneratedVTHO();
+        if (_totalVtho == 0) {
+            return 0;
+        }
+
+        uint256 _userVtho = _totalVtho.mul(_userContrib).div(_totalContrib);
+        return _userVtho;
+    }
+
+    // msg.sender claims the vtho that he holds, to the receiver
+    // 1) the pair (de-facto owner of vtho on VVET smart contract), transfers the vtho out.
+    // 2) trim the user's contribution on this pool.
+    function claimGeneratedVTHO(address receiver) external {
+        address _who = msg.sender; // save gas
+        uint256 _userContrib = viewContribution(_who);
+        require (_userContrib > 0, "UniswapV2Pair: user contribution is 0");
+        uint256 _userVtho = viewUserGeneratedVTHO(_who);
+        require (_userVtho > 0, "UniswapV2Pair: user generated vtho is 0");
+        IVthoClaimable(WETH).claimVTHO(receiver, _userVtho);
+        removeContribution(_who, _userContrib);
+        emit ClaimGeneratedVTHO(_who, receiver, _userVtho);
     }
 }

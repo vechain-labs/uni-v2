@@ -26,15 +26,18 @@ describe('UniswapV2Factory', () => {
   const loadFixture = createFixtureLoader(provider, [wallet, other])
 
   let factory: Contract
+  let weth: Contract
   beforeEach(async () => {
     const fixture = await loadFixture(factoryFixture)
     factory = fixture.factory
+    weth = fixture.weth
   })
 
-  it('feeTo, feeToSetter, allPairsLength', async () => {
+  it('feeTo, feeToSetter, allPairsLength, weth', async () => {
     expect(await factory.feeTo()).to.eq(AddressZero)
     expect(await factory.feeToSetter()).to.eq(wallet.address)
     expect(await factory.allPairsLength()).to.eq(0)
+    expect(await factory.WETH()).to.eq(weth.address)
   })
 
   async function createPair(tokens: [string, string]) {
@@ -68,7 +71,7 @@ describe('UniswapV2Factory', () => {
   it('createPair:gas', async () => {
     const tx = await factory.createPair(...TEST_ADDRESSES)
     const receipt = await tx.wait()
-    expect(receipt.gasUsed).to.eq(2512920)
+    expect(receipt.gasUsed).to.eq(3144040) // 2512920
   })
 
   it('setFeeTo', async () => {
